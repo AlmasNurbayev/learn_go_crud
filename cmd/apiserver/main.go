@@ -38,10 +38,10 @@ func main() {
 		log.Fatal(err2)
 	}
 
-	config.Store.DatabaseURL = viper.GetString("database_url")
+	config.DatabaseURL = viper.GetString("database_url")
+	config.KeyJwt = viper.GetString("key_jwt")
 
-	s := apiserver.New(config)
-	if err := s.Start(); err != nil {
+	if err := apiserver.Start(config); err != nil {
 		log.Fatal(err)
 	}
 }
