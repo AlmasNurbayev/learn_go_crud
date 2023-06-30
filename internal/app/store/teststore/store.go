@@ -40,7 +40,7 @@ func (s *Store) User() store.UserRepository {
 
 	s.userRepository = &UserRepository{
 		store: s,
-		users: make(map[string]*model.User),
+		users: []*model.User{},
 	}
 
 	return s.userRepository

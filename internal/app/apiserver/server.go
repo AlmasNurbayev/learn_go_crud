@@ -36,8 +36,17 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) configureRouter() {
-	s.router.HandleFunc("/users", s.UserCreate()).Methods("Post")
-	s.router.HandleFunc("/auth", s.UserAuth()).Methods("Post")
+	s.router.Use(s.SetRequestID)
+	s.router.Use(s.LogRequest)
+	s.router.Use(mux.CORSMethodMiddleware(s.router))
+	s.router.HandleFunc("/users", s.UserCreate()).Methods("Post", "Options")
+	s.router.HandleFunc("/auth", s.UserAuth()).Methods("Post", "Options")
+
+	private := s.router.PathPrefix("/api").Subrouter()
+	private.Use(s.CheckJWT)
+	private.HandleFunc("/users", s.UserGet()).Methods("Get", "Options")
+	//private.Use(mux.CORSMethodMiddleware(private))
+
 }
 
 func (s *server) configureLogger() error {

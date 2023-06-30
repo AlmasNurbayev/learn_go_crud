@@ -40,3 +40,30 @@ func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 
 	return u, nil
 }
+
+func (r *UserRepository) FindAll() ([]*model.User, error) {
+
+	//defer rows.Close()
+
+	users := []*model.User{}
+	rows, err := r.store.db.Query("select id, email, encrypted_password from users")
+
+	if err != nil {
+		return nil, err
+	}
+	if err == sql.ErrNoRows {
+		return nil, store.ErrRecordNotFound
+	}
+
+	for rows.Next() {
+		u := model.User{}
+		if err := rows.Scan(&u.Id, &u.Email, &u.Encrypted_password); err != nil {
+			return nil, store.ErrRecordNotFound
+		}
+		users = append(users, &u)
+
+	}
+
+	return users, nil
+
+}
